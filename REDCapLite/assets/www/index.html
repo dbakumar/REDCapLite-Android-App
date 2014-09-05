@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>APISetting</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="./css/jquery.mobile-1.4.3.min.css" />
+	<script src="./js/jquery.min.js"></script>
+	<script src="./js/jquery.mobile-1.4.3.min.js"></script>
+</head>
+<body>
+
+		<!-- Start of first page: #one -->
+		<div data-role="page" id="one">
+		
+			<div data-role="header">
+				<h1 id="heading">Loading..</h1>
+			</div><!-- /header -->
+		
+			<div data-role="content" id="formSelectList">	
+				<h2>One</h2>
+		 	</div><!-- /content -->
+			
+			<div data-role="footer" data-theme="d">
+				<p style="text-align:center">					 
+						<a href="#apps" data-rel="dialog" data-role="button" data-icon="grid" data-iconpos="notext">apps</a>
+						<a href="#setting"  data-role="button" data-icon="gear" data-iconpos="notext">gear</a>
+ 				</p>
+			</div><!-- /footer -->
+		</div><!-- /page one -->
+
+		
+		<!-- Start of second page: #two -->
+		<div data-role="page" id="select-item" data-theme="a">
+		
+			<div data-role="header" id="select-item-header">
+				<h1>header</h1>
+			</div><!-- /header -->
+		
+			<div data-role="content" data-theme="a" id="select-item-content">	
+			 asdfasdf
+				
+			</div><!-- /content -->
+			
+			<div data-role="footer">
+				<p style="text-align:center">					 
+						<a href="index.html" data-role="button" data-icon="home" data-iconpos="notext">home</a>
+						<a href="#apps" data-role="button" data-icon="grid" data-iconpos="notext">apps</a>
+						<a href="#setting" data-role="button" data-icon="gear" data-iconpos="notext">gear</a>
+						
+				</p>
+			</div><!-- /footer -->
+		</div><!-- /page two -->
+
+ 
+		<div data-role="page" id="setting">
+			
+			<div data-role="header">
+				<h1>REDCap API Setting</h1>
+			</div><!-- /header -->
+		
+		    <div data-role="content">
+				<form id="metadataform">		
+				    <input type="text" id="apikey" placeholder="API TOKEN" name="token" value="" /> 
+				    <input type="text" id="url" name="" placeholder="API URL" value="" />
+			 		<input type="button" value="Build Project" onClick="buildProject()" />
+			 	</form>
+		    </div>
+		    
+		    <div data-role="footer">
+				<p style="text-align:center">					 
+						<a href="index.html" data-role="button" data-icon="home" data-iconpos="notext">home</a>
+						<a href="#apps" data-rel="dialog" data-role="button" data-icon="grid" data-iconpos="notext">apps</a>
+				</p>
+			</div><!-- /footer -->
+		    
+		</div>
+		
+		<div data-role="page" id="apps">
+		    <div data-role="header">
+				<h1>Apps</h1>
+			</div><!-- /header -->
+		    <div data-role="content">
+		     	<p><input type="button" value="Send To Server" onClick="sendToServer()" /></p>
+		        <!-- <p><input type="button" value="Data Import"/></p> -->
+		    </div>
+		    <div data-role="footer">
+				<p style="text-align:center">					 
+						<a href="index.html" data-role="button" data-icon="home" data-iconpos="notext">home</a>
+						<a href="#setting" data-role="button" data-icon="gear" data-iconpos="notext">gear</a>
+ 				</p>
+			</div><!-- /footer -->
+		</div>
+
+<script type="text/javascript">
+	function buildProject( ) {
+   
+       var result = REDCapLiteEngine.buildProject(jQuery('#url').val(),jQuery('#apikey').val() );
+         
+    }
+    
+    function sendToServer () {
+       REDCapLiteEngine.appsToServer();
+    }
+
+    function showMsgAfterSendToServer(msg){
+    	Android.showToast(msg);
+    }
+
+     function getMetaData(){
+     	 metaData =  REDCapLiteEngine.getMetaData();
+     	 metaDataJSObject =  jQuery.parseJSON(metaData);
+     	 jQuery( ".ui-content" ).html(function() {
+     	    s="";
+     	    for(var i = 0; i < metaDataJSObject.length; i++) {
+     	       s = s+ "<ul>" + metaDataJSObject[i].field_name + "</ul>";
+     	    }   
+   		 	 return "<p>All new content for " + s + "</p>";
+		 });
+      	 	
+     }
+     
+     function getFormList(){
+     	 
+     	 formListHtml =  REDCapLiteEngine.getFormList();
+     
+     	 jQuery( "#heading" ).text(function() {
+   		 	return "Select Form"
+  		 });
+     	 
+     	 jQuery( "#formSelectList" ).html(function() {
+   		 	 return formListHtml;
+   		 	 
+		 }).trigger( "create" );
+     
+   
+     	 	
+     }
+     
+     
+     function createOrSelectStudyId(){
+         //var idList = REDCapLiteEngine.getIdList();
+         var idList = REDCapLiteEngine.getAdvancedIdList();
+        list = "<ul data-role='listview' data-inset='true' data-filter='true'>";
+          
+        if (idList)   {
+	        var ids = idList.split("||");
+	        list = "<ul data-role='listview' data-inset='true' data-filter='true'>";
+	        for (var i = 0; i < ids.length; i++) {
+	           if( ids[i]) {
+	              list = list + "<li><a href='' onclick='getFormListWithStudyID(\""+ ids[i].substring(0, 14) +"\")' >" + ids[i].substring(0, 14); + "</a></li>";
+	               
+	             }
+	        }
+        }
+        list = list +"</ul>";
+        
+        
+                 
+     	jQuery( "#heading" ).text(function() {
+   		 	return "Create Or Select Study Id";
+  		});
+  		
+  		jQuery( "#formSelectList" ).html(function() {
+   		 	 
+   		 	var link = "<a href='' data-role='button' data-icon='plus' data-iconpos='' onclick='getFormListWithStudyID(0)'>Create New</a>";
+   		 	link = link + list;
+   		 	 return link;
+   		 	 
+		 }).trigger( "create" );
+     
+  		
+     }
+      
+     
+     function pageInit(){
+     
+       //prepareDynamicPage();
+       //getFormList();
+       createOrSelectStudyId();
+       	
+      }
+     
+     function getFormListWithStudyID(id){
+     	
+     	 
+     	 REDCapLiteEngine.setCurrentStudyId(id);
+     	 
+         formListHtml =  REDCapLiteEngine.getFormList();
+         
+     	 jQuery( "#heading" ).text(function() {
+   		 	return "Select Form For " + id;
+  		 });
+     	 
+     	 jQuery( "#formSelectList" ).html(function() {
+   		 	 return formListHtml;
+   		 	 
+		 }).trigger( "create" );
+		 
+		  
+     
+     }
+       
+       
+       
+       
+    
+      
+	  jQuery(document).bind( "pagebeforechange", function( e, data ) {
+ 			if ( typeof data.toPage === "string" ) {
+				 
+				var u = $.mobile.path.parseUrl( data.toPage ),
+					re = /^#select-item/;
+				if ( u.hash.search(re) !== -1 ) {
+				
+					//showForm( u, data.options );
+					
+					var formName = u.hash.replace( /.*form=/, "" );
+					
+  					 jQuery( "#select-item-header" ).html(function() {
+   		 				return "<h1>"+formName+"</h1>"
+  					 });
+  					 
+  					 var htmlForm = REDCapLiteEngine.getForm(formName);
+  					 
+  					 // Android.showToast(htmlForm);
+  					  
+  					 jQuery( "#select-item-content" ).html(function() {
+  					    var htmlForm = REDCapLiteEngine.getForm(formName);
+   		 				return htmlForm;
+  					 }).trigger( "create" );
+		
+					 var formData = REDCapLiteEngine.getFormData("#FORMID_"+formName);
+					 
+					 
+					 if (formData) { 
+					 	var jsObject = JSON.parse(formData);
+					 	 $(':input', "#FORMID_"+formName).each(function() {
+					 	 	 
+					 	 	 if ($(this).is(':text')) 
+					 	     if (jsObject[this.name])  {
+           						this.value = jsObject[this.name];
+           						//$('select[name="'+this.name+'"]').find('option[value="'+jsObject[this.name]+'"]').attr("selected",true);
+           					 }
+           					 
+           					 if ($(this).is(':radio')) {
+       								   var res = this.name.split("__",2);
+       								   $('input[name="' + res[0] + '__radio"][value="' + jsObject[res[0]] + '"]').attr('checked',true).checkboxradio("refresh");
+    						 }
+    						 
+    						 if ($(this).is(':checkbox')) {
+       								   var res = this.name.split("__",2);
+       								   
+       								   var value = this.value; 
+       								   Android.showToast(res[1]+"___"+value + " :: " + jsObject[ res[1]+"___"+value]);
+       								   
+       								   if(jsObject[ res[1]+"___"+value ] == 1) {
+       								         $(this).attr('checked',true).checkboxradio("refresh");
+       								         $("#"+res[1]+"___"+value).val(1);
+       								   }
+       								   
+    						 }
+    						 
+           					 
+        				 });
+        				 
+        				  $('select', "#FORMID_"+formName).each(function() {
+					 	 	
+					 	     if (jsObject[this.name])  {
+					 	         
+					 	        $(this).find("option[value='" + jsObject[this.name] + "']").prop('selected',true); 
+					 	        $(this).selectmenu('refresh', true);
+           						 
+           					 }
+        				 });
+        				 
+        				   
+        				  $('textarea', "#FORMID_"+formName).each(function() {
+					 	 	
+					 	     if (jsObject[this.name])  {
+					 	        this.value = jsObject[this.name]; 
+					 	        
+           						 
+           					 }
+        				 }); 
+        				 
+        				   
+ 					  
+					 }
+					//e.preventDefault();
+				}  
+				
+				
+			}
+		}); 
+		
+	
+	  function saveRecord(formName ){
+	    var arrObj = {};
+	    $(':input', formName).each(function() {
+	    
+           if ($(this).is(':radio') || $(this).is(':checkbox') || $(this).is(':button')) { 
+           } else {
+             arrObj[this.name] = this.value;
+           }	    
+           
+        });
+       
+        //saveResult = REDCapLiteEngine.saveRecord(JSON.stringify(arrObj), formName);
+        saveResult = REDCapLiteEngine.advancedSaveRecord(JSON.stringify(arrObj), formName);
+        
+        if (saveResult == "OK") {Android.showToast( "saved successfully" )}; 
+ 
+	  	e.preventDefault();
+      	return false;
+	  }	
+	  
+	 
+	   
+ 
+
+</script>
+</body>
+</html>

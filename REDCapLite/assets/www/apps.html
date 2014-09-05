@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>APISetting</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="./css/jquery.mobile-1.4.3.min.css" />
+	<script src="./js/jquery.min.js"></script>
+	<script src="./js/jquery.mobile-1.4.3.min.js"></script>
+</head>
+<body>
+
+<div data-role="page">
+
+	<div data-role="header">
+		<h1>REDCapLite Setting</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+	  <form id="metadataform">		
+	    <input type="text" id="apikey" name="token" value="21E5FA9D42C68A60B8998B691C4AB98A" />
+	    <input type="text" id="url" name="" value="https://hprfstudies.org/redcap/api/" />
+ 		<input type="button" value="Build Project" onClick="buildProject()" />
+ 	</form>
+	</div><!-- /content -->
+
+	 
+</div><!-- /page -->
+
+
+
+<script type="text/javascript">
+	 
+    function pageInit(){
+    
+    }
+
+    function buildProject( ) {
+   
+       var result = REDCapLiteEngine.buildProject(jQuery('#url').val(),jQuery('#apikey').val() );
+         Android.showToast("Ask API Key to User..." + result);
+         
+    }
+    
+    function completedMessage(){
+     	  jQuery( ".ui-content" ).html(function() {
+		  var emphasis = "<em>" +  " paragraphs!</em>";
+		  return "<p>All new content for " + emphasis + "</p>";
+		});
+
+    }
+</script>
+</body>
+</html>
